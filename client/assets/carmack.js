@@ -13,9 +13,9 @@ if (window.location.hostname == "0.0.0.0" || window.location.hostname == "localh
     base = "http://localhost:8001";
     wsbase = "ws://localhost:8001";
 } else {
-    web = "https://silentspacemarine.com";
-    base = "https://router.silentspacemarine.com";
-    wsbase = "wss://router.silentspacemarine.com";
+    web = "https://doom.lon1.do.staging.livekit-internal.net/";
+    base = "https://api-doom.lon1.do.staging.livekit-internal.net";
+    wsbase = "wss://api-doom.lon1.do.staging.livekit-internal.net";
 }
 
 timer = false;
