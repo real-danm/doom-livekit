@@ -23,6 +23,9 @@ type SomeStruct struct {
 	GameStarted bool   `json:"gameStarted"`
 }
 
+// create map of clients websockets
+var clients = make(map[uint32]*websocket.Conn)
+
 var upgrader = websocket.Upgrader{} // use default options
 
 var host = "https://dan.staging.livekit.cloud"
@@ -58,25 +61,37 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error during message reading:", err)
 			break
 		}
-		log.Printf("Received: %s of type %d", message, messageType)
+		fmt.Println("Received: ", message, " of type ", messageType)
 
-		from := message[0:4]
-		to := message[4:8]
+		to := message[0:4]
+		from := message[4:8]
 
 		// decode this on the receiving end
-		tt := binary.LittleEndian.Uint32(from)
-		tt2 := binary.LittleEndian.Uint32(to)
-		fmt.Println(tt)
-		fmt.Println(tt2)
+		fromA := binary.LittleEndian.Uint32(from)
+		ToB := binary.LittleEndian.Uint32(to)
+
+		//fmt.Println("from: ", string(from))
+		//fmt.Println("to: ", string(to))
+		//fmt.Println("clients size: ", len(clients))
+		// add to clients map
+		clients[fromA] = conn
+		// check if to is in the map
+		if _, ok := clients[ToB]; ok {
+			// send message to to
+			clients[ToB].WriteMessage(messageType, message[4:])
+		} else {
+			// write out error
+			fmt.Println("ERROR: no client with id " + string(ToB))
+		}
 
 		// need to save these tt values (they are numerical)
 		// then listen to data from the room, when you receive data, use the websocket to send it back to doom
 		//
-		roomClient.SendData(context.Background(), &livekit.SendDataRequest{
-			Room:            roomName,
-			Data:            to,
-			DestinationSids: []string{},
-		})
+		//roomClient.SendData(context.Background(), &livekit.SendDataRequest{
+		//	Room:            roomName,
+		//		Data:            to,
+		//	DestinationSids: []string{},
+		//})
 		/*err = conn.WriteMessage(messageType, message)
 		if err != nil {
 			log.Println("Error during message writing:", err)
@@ -125,6 +140,7 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	fmt.Println("starting server")
 	http.HandleFunc("/api/ws/", socketHandler)
 	http.HandleFunc("/api/newroom", newRoomHandler)
 	http.HandleFunc("/api/room/", roomHandler)

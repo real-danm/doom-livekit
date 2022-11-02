@@ -4,6 +4,8 @@ go 1.18
 
 require github.com/livekit/server-sdk-go v0.10.5
 
+require golang.org/x/sync v0.0.0-20220923202941-7f9b1623fab7 // indirect
+
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
@@ -19,6 +21,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jxskiss/base62 v1.1.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
+	github.com/livekit/mageutil v0.0.0-20221002073820-d9198083cfdc
 	github.com/livekit/protocol v1.0.2-0.20220907025839-ca55e87895c4 // indirect
 	github.com/magefile/mage v1.13.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
