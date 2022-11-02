@@ -34,6 +34,8 @@ var apiSecret = "toNltPyZ8xiRDzese7hbdKUd2S6lpfyrs0DiASgRfPuB"
 
 var roomClient = lksdk.NewRoomServiceClient(host, apiKey, apiSecret)
 
+var allConns map[uint32]*websocket.Conn
+
 func randomString(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	b := make([]byte, length)
@@ -139,11 +141,29 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(a)
 }
 
+func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	s := strings.Split(r.URL.Path, "/")
+	roomName := s[len(s)-2]
+	participantIdentity := s[len(s)-1]
+	fmt.Printf("roomName: %s, participantIdentity: %s\n", roomName, participantIdentity)
+	token, err := getJoinToken(roomName, participantIdentity)
+	if err != nil {
+		log.Printf("error creating token: %v", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(token)
+}
+
 func main() {
 	fmt.Println("starting server")
 	http.HandleFunc("/api/ws/", socketHandler)
 	http.HandleFunc("/api/newroom", newRoomHandler)
 	http.HandleFunc("/api/room/", roomHandler)
+	http.HandleFunc("/api/token/", tokenHandler)
 	log.Fatal(http.ListenAndServe("0.0.0.0:8001", nil))
 }
 
