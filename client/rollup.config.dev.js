@@ -34,7 +34,7 @@ export default {
     commonjs(),
     json(),
     serve({ contentBase: './assets', open: true, port: "8080" }),
-    watcher(['./assets/index.html', './assets/styles.css']),
+    watcher(['./assets/index.html', './assets/romero.css']),
     livereload(),
   ],
 };

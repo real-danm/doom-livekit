@@ -13,9 +13,12 @@ if (window.location.hostname == "0.0.0.0" || window.location.hostname == "localh
     base = "http://localhost:8001";
     wsbase = "ws://localhost:8001";
 } else {
-    web = "https://silentspacemarine.com";
-    base = "https://router.silentspacemarine.com";
-    wsbase = "wss://router.silentspacemarine.com";
+    //web = "https://silentspacemarine.com";
+    //base = "https://router.silentspacemarine.com";
+    //wsbase = "wss://router.silentspacemarine.com";
+    web = "https://doom.lon1.do.staging.livekit-internal.net/";
+    base = "https://doom.lon1.do.staging.livekit-internal.net/";
+    wsbase = "wss://doom.lon1.do.staging.livekit-internal.net/";
 }
 
 timer = false;
@@ -336,7 +339,7 @@ choosePet = (next) => {
         if (mp.value.length) {
             clickEffect("mypet", () => {
                 commonArgs = commonArgs.concat(["-pet", mp.value]);
-                next();
+                next(mp.value);
             });
         }
     };
@@ -351,7 +354,7 @@ startMultiplayer = () => {
     fetch(`${base}/api/newroom`)
         .then((response) => response.json())
         .then((data) => {
-            choosePet(() => {
+            choosePet((petname) => {
                 deathMatchOr(() => {
                     display(["logo"], "none");
                     room = data.room;
@@ -376,6 +379,13 @@ startMultiplayer = () => {
                         callMain(commonArgs.concat(["-server", "-privateserver", "-dup", "1", "-wss", `${wsbase}/api/ws/${e.target.getAttribute("data-room")}`]));
                     });
                 });
+
+                fetch(`${base}/api/token/${data.room}/${petname}`)
+                    .then((response) => response.json())
+                    .then(async (data) => {
+                        console.log("token data: ", data);
+                        await connectToLiveKit(data);
+                    });
             });
         });
 };
@@ -420,11 +430,18 @@ if (hasWebAssembly()) {
                                 }, 7000);
                             } else {
                                 setTimeout(() => {
-                                    choosePet(() => {
+                                    choosePet((petname) => {
                                         display(["menu"], "none");
                                         display(["canvas"]);
                                         typewriter(["Connecting to master server. Please wait.", "Still trying. Is the master server for this room running?"]);
                                         callMain(commonArgs.concat(["-connect", "1", "-dup", "1", "-wss", `${wsbase}/api/ws/${room}`]));
+
+                                        fetch(`${base}/api/token/${room}/${petname}`)
+                                            .then((response) => response.json())
+                                            .then(async (data) => {
+                                                console.log("token data: ", data);
+                                                await connectToLiveKit(data);
+                                            });
                                     });
                                 }, 3000);
                             }
