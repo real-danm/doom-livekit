@@ -29,8 +29,8 @@ var clients = make(map[uint32]*websocket.Conn)
 var upgrader = websocket.Upgrader{} // use default options
 
 var host = "https://dan.staging.livekit.cloud"
-var apiKey = "APIdVQYDzMshqax"
-var apiSecret = "toNltPyZ8xiRDzese7hbdKUd2S6lpfyrs0DiASgRfPuB"
+var apiKey = "###"
+var apiSecret = "###"
 
 var roomClient = lksdk.NewRoomServiceClient(host, apiKey, apiSecret)
 
